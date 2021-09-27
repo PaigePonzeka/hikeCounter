@@ -27,7 +27,7 @@ h1 { text-align: center; }
 
 .hex .demo-headline, .hex .demo-paragraph { width: 100%; padding: 5%; box-sizing: border-box; opacity: 0; margin: 0; padding: 0; }
 
-.demo-headline { color: white; font-weight: bold; text-transform: capitalize; text-align: center; top: 25%; padding-top: 50%; font-size: 1.1em; z-index: 1; line-height: 1.5; }
+.demo-headline { color: white; font-weight: bold; text-transform: capitalize; text-align: center; bottom: 50%; padding-top: 50%; font-size: 1.1em; z-index: 1; }
 
 .demo-paragraph { top: 50%; text-align: center; font-size: 1em; font-weight: 300; }
 
