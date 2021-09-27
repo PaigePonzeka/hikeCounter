@@ -6,6 +6,7 @@ layout: default
 title: Home
 ---
 <h1 >Hike Counter</h1>
+ <h2> The Latest Year on the Road Hike Totals </h2>
 <div class="js-hikeCounter">
   <div class="stats">
     <strong class="stat-count js-hike-count">__</strong>&nbsp;Total Hikes &nbsp;
