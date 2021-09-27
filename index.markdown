@@ -14,18 +14,21 @@ title: Home
   <div class="grid">
       <ul id="hexGrid">
       </ul>
+      <div class="stats">
+    <strong class="stat-count js-hike-count">__</strong>&nbsp;Total Hikes &nbsp;
+    <strong class="stat-count js-mile-count">__</strong>&nbsp;Total Miles
+  </div>
     </div>
 </div>
 
 <script id="hike-template"  type="text/x-handlebars-template">
   {% raw %}
     {{#each entities}}
-      <li class="hex">
+      <li class="hex" style="display: none;">
         <div class="hexIn">
           <a class="hexLink" href="#">
             <div class='img' style='background-image:url({{photo}});'></div>
-            <p class="demo-paragraph">{{count}}</p>
-            <h5 class="demo-headline">{{name}}</h5>
+            <h5 class="demo-headline">{{count}} <br/> {{name}}</h5>
           </a>
         </div>
       </li>

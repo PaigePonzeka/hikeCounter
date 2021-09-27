@@ -1,10 +1,12 @@
 /**
  * Creates a tooltip item that pops up when user clicks on the button
  */
+var hikesList;
 var HikeCounter = function(options) {
   var $container = $('.js-hikeCounter');
   this.totalHikes = 0;
   this.totalMiles = 0;
+  this.hikeList;
   var template = $('#hike-template');
 
   if (template) {
@@ -16,37 +18,38 @@ var HikeCounter = function(options) {
   if ($container) {
     this.init();
   }
-
-
 }
 
-
 HikeCounter.prototype.init = function() {
-  console.log('init Hike Counter');
-  this.get();
+  this.get(0);
 };
 
 
-HikeCounter.prototype.get = function() {
+HikeCounter.prototype.get = function(offset) {
 
   var self = this;
-  var limit = 50;
+  var limit = 10;
 
-  fetch('https://liveapi.yext.com/v2/accounts/me/entities?api_key=9f6490ce2bc3be7bebb3dbfccd295744&v=20210923&entityTypes=ce_hike&savedFilterIds=649845236&limit=' + limit)
+  fetch('https://liveapi.yext.com/v2/accounts/me/entities?api_key=9f6490ce2bc3be7bebb3dbfccd295744&v=20210923&entityTypes=ce_hike&savedFilterIds=649845236&limit=' + limit + '&offset=' + offset)
   .then(response => response.json())
   .then(data => {
 
-    this.setCount(data.response.count);
-
-    // TODO if total hikes > limit run another query
-
-    console.log('totalHikes', self.totalHikes);
-
     if (data.response && data.response.entities) {
       let processedData = this.process(data.response.entities);
-      this.add({
-        entities: processedData
-      });
+      if (hikesList) {
+        hikesList = hikesList.concat(processedData);
+      } else {
+        hikesList = processedData;
+      }
+    }
+
+    // if the total number of entities gotten is less than the count
+    if (offset + limit < data.response.count) {
+      this.get(offset + limit);
+    } else {
+      // start adding entities
+
+      this.startAdd();
     }
 
   })
@@ -56,8 +59,42 @@ HikeCounter.prototype.setCount = function(count) {
   $('.js-hike-count').html(count);
 };
 
-HikeCounter.prototype.setMiles = function() {
-  $('.js-mile-count').html(this.totalMiles);
+HikeCounter.prototype.setMiles = function(miles) {
+  $('.js-mile-count').html(miles);
+}
+
+HikeCounter.prototype.startAdd = function() {
+  // iterate through all hikes and slowly add them
+
+  var self = this;
+  var start = 0;
+  var end = hikesList.length;
+  var interval = 1;
+  this.addInterval(start, end, interval);
+
+};
+
+HikeCounter.prototype.addInterval = function(start, end, interval) {
+  var self = this;
+  window.setTimeout(function() {
+    var toShow = hikesList.slice(start, start + interval);
+
+    self.add({entities: toShow});
+    self.setCount(start + interval);
+
+    toShow.forEach(function(entity){
+      if (entity.c_length){
+        self.totalMiles += parseInt(entity.c_length);
+      }
+
+    });
+
+    self.setMiles(self.totalMiles);
+
+    if (start + interval < end) {
+      self.addInterval(start + interval, end, interval);
+    }
+  }, 250);
 }
 
 HikeCounter.prototype.process = function(entities) {
@@ -92,7 +129,14 @@ HikeCounter.prototype.process = function(entities) {
 HikeCounter.prototype.add = function(entities) {
   // todo count every 5 and add them to the view in a timeout
   var results = this.hikeTemplate(entities);
+
   $('#hexGrid').append(results);
+  $('#hexGrid .hex').fadeIn('slow');
+  var last = $('#hexGrid .hex').last();
+  $('html, body').animate({
+      scrollTop: last.offset().top
+  }, 250);
+
 }
 
 

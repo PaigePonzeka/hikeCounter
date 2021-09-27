@@ -55,7 +55,7 @@ h1 {
   position: relative;
   visibility:hidden;
   outline:1px solid transparent; /* fix for jagged edges in FF on hover transition */
-  transition: all 0.5s;
+  transition: all 1s;
   backface-visibility: hidden;
   will-change: transform;
   transition: all 0.5s;
