@@ -2,6 +2,7 @@
  * Creates a tooltip item that pops up when user clicks on the button
  */
 var hikesList;
+var count = 1;
 var HikeCounter = function(options) {
   var $container = $('.js-hikeCounter');
   this.totalHikes = 0;
@@ -100,7 +101,7 @@ HikeCounter.prototype.addInterval = function(start, end, interval) {
 HikeCounter.prototype.process = function(entities) {
   let processEntities = [];
   var self = this;
-  var count = 1;
+
 
   entities.forEach(function(entity) {
 
