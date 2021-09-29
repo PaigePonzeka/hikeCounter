@@ -8,6 +8,7 @@ var HikeCounter = function(options) {
   this.totalHikes = 0;
   this.totalMiles = 0;
   this.hikeList;
+  this.shouldScroll = true;
   var template = $('#hike-template');
 
   if (template) {
@@ -19,6 +20,14 @@ var HikeCounter = function(options) {
   if ($container) {
     this.init();
   }
+  // stop the scroll when the user scrolls
+  var self = this;
+  window.setTimeout(function() {
+    $(window).on('mousewheel DOMMouseScroll', function() {
+      self.shouldScroll = false;
+    });
+  }, 500);
+
 }
 
 HikeCounter.prototype.init = function() {
@@ -49,8 +58,13 @@ HikeCounter.prototype.get = function(offset) {
       this.get(offset + limit);
     } else {
       // start adding entities
+      var self = this;
+      window.setTimeout(function() {
+        $('.js-loader').fadeOut();
+        self.startAdd();
 
-      this.startAdd();
+      }, 100)
+
     }
 
   })
@@ -66,7 +80,6 @@ HikeCounter.prototype.setMiles = function(miles) {
 
 HikeCounter.prototype.startAdd = function() {
   // iterate through all hikes and slowly add them
-
   var self = this;
   var start = 0;
   var end = hikesList.length;
@@ -77,6 +90,7 @@ HikeCounter.prototype.startAdd = function() {
 
 HikeCounter.prototype.addInterval = function(start, end, interval) {
   var self = this;
+  console.log('total miles', self.totalMiles);
   window.setTimeout(function() {
     var toShow = hikesList.slice(start, start + interval);
 
@@ -84,18 +98,27 @@ HikeCounter.prototype.addInterval = function(start, end, interval) {
     self.setCount(start + interval);
 
     toShow.forEach(function(entity){
+      console.log('count', count);
+      console.log(parseFloat(entity.c_length));
+      console.log('total miles', self.totalMiles);
       if (entity.c_length){
-        self.totalMiles += parseInt(entity.c_length);
+        self.totalMiles += parseFloat(entity.c_length);
       }
 
     });
 
-    self.setMiles(self.totalMiles);
+    self.setMiles(Math.round(self.totalMiles));
 
     if (start + interval < end) {
       self.addInterval(start + interval, end, interval);
+    } else {
+      $('.stat-news').fadeIn();
+      var last = $('#hexGrid .hex').last();
+      $('html, body').animate({
+        scrollTop: last.offset().top
+      }, 250);
     }
-  }, 250);
+  }, 200);
 }
 
 HikeCounter.prototype.process = function(entities) {
@@ -105,10 +128,6 @@ HikeCounter.prototype.process = function(entities) {
 
   entities.forEach(function(entity) {
 
-    if (entity.c_length) {
-      self.totalMiles += parseInt(entity.c_length);
-    }
-
     if (entity.photoGallery) {
       if (entity.photoGallery.length > 2) {
         entity.photo = entity.photoGallery[1].image.url;
@@ -117,13 +136,27 @@ HikeCounter.prototype.process = function(entities) {
       }
     }
 
+    let img = new Image();
+    img.src = entity.photo;
+
     entity.count = count;
     processEntities.push(entity);
     count++;
   });
-
+  var totalDays = this.totalDays();
+  var dayCounter = Math.round(totalDays / count);
+  $('.js-total-days').html(totalDays);
+  $('.js-hikes-per-day').text(dayCounter);
   this.setMiles();
   return processEntities;
+}
+
+// calculates the total days I've been on this trip
+HikeCounter.prototype.totalDays = function() {
+  var start = new Date("05/31/2021");
+  var today = new Date();
+
+  return Math.round((today.getTime() - start.getTime()) / (1000 * 3600 * 24));
 }
 
 // Add a Hike to the view
@@ -134,9 +167,12 @@ HikeCounter.prototype.add = function(entities) {
   $('#hexGrid').append(results);
   $('#hexGrid .hex').fadeIn('slow');
   var last = $('#hexGrid .hex').last();
-  $('html, body').animate({
-      scrollTop: last.offset().top
-  }, 250);
+
+  if (this.shouldScroll) {
+    $('html, body').animate({
+        scrollTop: last.offset().top
+    }, 250);
+  }
 
 }
 

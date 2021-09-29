@@ -5,17 +5,27 @@ h1 {
 }
 
 .stats {
-  display: flex;
   padding: 20px;
-  align-items: row;
-  justify-content: center;
-  font-size: 18px;
+
+  .stats-container {
+    display: flex;
+    align-items: row;
+    justify-content: center;
+    font-size: 24px;
+  }
 }
+
+.stat-news {
+  font-size: 14px;
+  font-style: italic;
+  text-align: center;;
+}
+
 #hexGrid {
   display: flex;
   flex-wrap: wrap;
   width: 90%;
-  margin: 0 auto;
+  margin: 20px auto;
   overflow: hidden;
   font-family: sans-serif;
   list-style-type: none;
