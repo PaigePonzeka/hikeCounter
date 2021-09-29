@@ -3,7 +3,7 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: default
-title: Home
+title: Paige OOO | Hike Counter
 ---
 <h1 >Hike Counter</h1>
 <h2> The Latest Year on the Road Hike Totals </h2>
